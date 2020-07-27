@@ -1,0 +1,72 @@
+﻿@model StudDiscViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>@Model.Student.Name</h1>
+<h4>@Model.Student.Group</h4>
+<div class="container">
+    <form method="post" asp-action="Index">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Selected[0].Title)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Selected[0].Annotation)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Selected[0].Teacher)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Selected)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Annotation)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Teacher.Name)
+                        </td>
+                        <td>
+                            <div class="form-check">
+                                <input type="checkbox" name="selectedDiscId" value="@item.Id" checked />
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @foreach (var item in Model.NonSelected)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Annotation)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Teacher.Name)
+                        </td>
+                        <td>
+                            <div class="form-check">
+                                <input type="checkbox" name="selectedDiscId" value="@item.Id" />
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="form-group">
+            <input type="submit" class="btn btn-primary" value="Submit" />
+        </div>
+        <input type="hidden" name="studentId" value="@Model.Student.Id" />
+    </form>
+</div>
+
