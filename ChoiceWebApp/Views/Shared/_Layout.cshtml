@@ -11,7 +11,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <span class="navbar-brand pt-0">ChoiceApp</span>
+                <a class="navbar-brand pt-0" asp-controller="Home" asp-action="Index">ChoiceApp</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -19,22 +19,25 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <partial name="_LoginPartial" />
                     <ul class="navbar-nav flex-grow-1">
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("User"))
+                        @if (AuthorizationService.AuthorizeAsync(User, "User").Result.Succeeded)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Select">Select</a>
                             </li>
                         }
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        @if (AuthorizationService.AuthorizeAsync(User, "Admin").Result.Succeeded)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Students" asp-action="Index">Students</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Teachers" asp-action="Index">Teacher</a>
+                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Disciplines" asp-action="Index">Discipline</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Teachers" asp-action="Index">Teachers</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Disciplines" asp-action="Index">Disciplines</a>
                             </li>
                         }
                         <li class="nav-item">

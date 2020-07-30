@@ -11,7 +11,7 @@ using ChoiceWebApp.Models;
 
 namespace ChoiceWebApp.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -29,6 +29,12 @@ namespace ChoiceWebApp.Controllers
 
         public IActionResult Index()
         {
+            return View();
+        }
+
+        [Authorize(Policy = "User")]
+        public IActionResult Select()
+        {
             var student = _context.Students
                                 .Include(s => s.StudDiscs)
                                 .SingleOrDefault(s => s.Id == _userManager.GetUserId(HttpContext.User));
@@ -41,14 +47,15 @@ namespace ChoiceWebApp.Controllers
             model.Selected = disciplines.Where(d => selectedDisc.Contains(d.Id))
                                         .OrderBy(d => d.Title)
                                         .ToList();
-            model.NonSelected = disciplines.Except(model.Selected)
+            model.NoSelected = disciplines.Except(model.Selected)
                                             .OrderBy(d => d.Title)
                                             .ToList();
             return View(model);
         }
 
+        [Authorize(Policy = "User")]
         [HttpPost]
-        public IActionResult Index(string studentId, int[] selectedDiscId)
+        public IActionResult Select(string studentId, int[] selectedDiscId)
         {
             var student = _context.Students
                                     .Include(s => s.StudDiscs)
@@ -60,7 +67,7 @@ namespace ChoiceWebApp.Controllers
             }
             _context.SaveChanges();
 
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Select));
         }
 
         [AllowAnonymous]

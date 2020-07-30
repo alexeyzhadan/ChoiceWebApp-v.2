@@ -6,7 +6,7 @@ using ChoiceWebApp.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Linq;
 
 namespace ChoiceWebApp
 {
@@ -19,14 +19,13 @@ namespace ChoiceWebApp
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            services.AddDefaultIdentity<IdentityUser>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
 
@@ -34,24 +33,27 @@ namespace ChoiceWebApp
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequiredLength = 5;
+                options.Password.RequiredLength = 6;
 
             }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, options =>
+            services.AddAuthorization(options =>
             {
-                options.LoginPath = "/Identity/Account/Login";
+                options.AddPolicy("User", policyBuilder => 
+                    policyBuilder.RequireAuthenticatedUser().RequireClaim("FullName"));
+
+                options.AddPolicy("Admin", policyBuilder => 
+                    policyBuilder.RequireAuthenticatedUser().RequireAssertion(context => 
+                        !context.User.Claims.Any(c => c.Type == "FullName")));
             });
 
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app,
                                     IWebHostEnvironment env,
-                                    UserManager<IdentityUser> userManager,
-                                    RoleManager<IdentityRole> roleManager)
+                                    UserManager<IdentityUser> userManager)
         {
             if (env.IsDevelopment())
             {
@@ -61,7 +63,6 @@ namespace ChoiceWebApp
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
@@ -72,7 +73,7 @@ namespace ChoiceWebApp
             app.UseAuthentication();
             app.UseAuthorization();
 
-            DataInitializer.SeedData(userManager, roleManager);
+            DataInitializer.SeedData(userManager);
 
             app.UseEndpoints(endpoints =>
             {

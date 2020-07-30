@@ -1,48 +1,24 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
 
 namespace ChoiceWebApp.Data
 {
     public static class DataInitializer
     {
-        public static void SeedData(UserManager<IdentityUser> userManager,
-                                    RoleManager<IdentityRole> roleManager)
-        {
-            SeedRoles(roleManager);
-            SeedUsers(userManager);
-        }
+        private const string ADMIN_USERNAME = "admin";
+        private const string ADMIN_EMAIL = "admin@admin.com";
+        private const string ADMIN_PASSWORD = "adminadmin";
 
-        private static void SeedRoles(RoleManager<IdentityRole> roleManager)
+        public static void SeedData(UserManager<IdentityUser> userManager)
         {
-            string user = "User";
-            string admin = "Admin";
-
-            if (!roleManager.RoleExistsAsync(user).Result)
-            {
-                roleManager.CreateAsync(new IdentityRole(user)).Wait();
-            }
-            if (!roleManager.RoleExistsAsync(admin).Result)
-            {
-                roleManager.CreateAsync(new IdentityRole(admin)).Wait();
-            }
-        }
-
-        private static void SeedUsers(UserManager<IdentityUser> userManager)
-        {
-            if (userManager.FindByNameAsync("admin").Result == null)
+            if (userManager.FindByNameAsync(ADMIN_USERNAME).Result == null)
             {
                 var user = new IdentityUser
                 {
-                    UserName = "admin@admin.com",
-                    Email = "admin@admin.com",
+                    UserName = ADMIN_USERNAME,
+                    Email = ADMIN_EMAIL,
                 };
-                var result = userManager.CreateAsync(user, "admin").Result;
-                userManager.AddClaimAsync(user, new Claim("FullName", "Admin")).Wait();
 
-                if (result.Succeeded)
-                {
-                    userManager.AddToRoleAsync(user, "Admin").Wait();
-                }
+                userManager.CreateAsync(user, ADMIN_PASSWORD).Wait();
             }
         }
     }

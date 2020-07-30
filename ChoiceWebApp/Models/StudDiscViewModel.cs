@@ -6,6 +6,6 @@ namespace ChoiceWebApp.Models
     {
         public Student Student { get; set; }
         public List<Discipline> Selected { get; set; }
-        public List<Discipline> NonSelected { get; set; }
+        public List<Discipline> NoSelected { get; set; }
     }
 }

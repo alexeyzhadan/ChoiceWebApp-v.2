@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ChoiceWebApp.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public class StudentsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,14 +18,12 @@ namespace ChoiceWebApp.Controllers
             _context = context;
         }
 
-        // GET: Students
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Students.Include(s => s.User).OrderBy(s => s.Name);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Students/Details/5
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -34,9 +32,9 @@ namespace ChoiceWebApp.Controllers
             }
 
             var student = await _context.Students
-                .Include(s => s.User)
-                .Include(s => s.StudDiscs)
-                .SingleOrDefaultAsync(m => m.Id == id);
+                                        .Include(s => s.User)
+                                        .Include(s => s.StudDiscs)
+                                        .SingleOrDefaultAsync(m => m.Id == id);
 
             if (student == null)
             {
