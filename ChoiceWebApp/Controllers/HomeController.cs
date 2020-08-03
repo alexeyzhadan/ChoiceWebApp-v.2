@@ -8,6 +8,8 @@ using System.Linq;
 using System.Collections.Generic;
 using ChoiceWebApp.Data;
 using ChoiceWebApp.Models;
+using ChoiceWebApp.Attributes;
+using System;
 
 namespace ChoiceWebApp.Controllers
 {
@@ -32,12 +34,18 @@ namespace ChoiceWebApp.Controllers
             return View();
         }
 
-        [Authorize(Policy = "User")]
+        [ForStudent]
         public IActionResult Select()
         {
             var student = _context.Students
                                 .Include(s => s.StudDiscs)
                                 .SingleOrDefault(s => s.Id == _userManager.GetUserId(HttpContext.User));
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
             var selectedDisc = student.StudDiscs.Select(sd => sd.DisciplineId).ToList();
             var disciplines = _context.Disciplines
                                     .Include(d => d.Teacher)
@@ -53,7 +61,7 @@ namespace ChoiceWebApp.Controllers
             return View(model);
         }
 
-        [Authorize(Policy = "User")]
+        [ForStudent]
         [HttpPost]
         public IActionResult Select(string studentId, int[] selectedDiscId)
         {

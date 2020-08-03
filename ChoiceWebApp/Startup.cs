@@ -39,7 +39,7 @@ namespace ChoiceWebApp
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("User", policyBuilder => 
+                options.AddPolicy("User", policyBuilder =>
                     policyBuilder.RequireAuthenticatedUser().RequireClaim("FullName"));
 
                 options.AddPolicy("Admin", policyBuilder => 
