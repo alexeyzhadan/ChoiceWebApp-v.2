@@ -5,11 +5,13 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using ChoiceWebApp.Data;
 using ChoiceWebApp.Models;
+using ChoiceWebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
 namespace ChoiceWebApp.Areas.Identity.Pages.Account
@@ -24,17 +26,20 @@ namespace ChoiceWebApp.Areas.Identity.Pages.Account
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
+        private readonly IGroupsService _groupService;
 
         public RegisterModel(
             ApplicationDbContext context,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            ILogger<RegisterModel> logger)
+            ILogger<RegisterModel> logger,
+            IGroupsService groupService)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _groupService = groupService;
         }
 
         [BindProperty]
@@ -76,6 +81,8 @@ namespace ChoiceWebApp.Areas.Identity.Pages.Account
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            ViewData["Groups"] = new SelectList(_groupService.Groups);
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)

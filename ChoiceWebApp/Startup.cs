@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using ChoiceWebApp.Services.Extentions;
+using ChoiceWebApp.Services.Interfaces;
 
 namespace ChoiceWebApp
 {
@@ -47,13 +49,16 @@ namespace ChoiceWebApp
                         !context.User.Claims.Any(c => c.Type == "FullName")));
             });
 
+            services.AddGroups();
+
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
 
         public void Configure(IApplicationBuilder app,
                                     IWebHostEnvironment env,
-                                    UserManager<IdentityUser> userManager)
+                                    UserManager<IdentityUser> userManager,
+                                    IGroupsJsonIOService groups)
         {
             if (env.IsDevelopment())
             {
@@ -73,7 +78,7 @@ namespace ChoiceWebApp
             app.UseAuthentication();
             app.UseAuthorization();
 
-            DataInitializer.SeedData(userManager);
+            DataInitializer.SetData(userManager, groups);
 
             app.UseEndpoints(endpoints =>
             {
