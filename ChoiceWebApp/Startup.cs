@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
-using ChoiceWebApp.Services.Extensions;
+using ChoiceWebApp.Extensions;
 using System.Collections.Generic;
 
 namespace ChoiceWebApp
@@ -78,7 +78,7 @@ namespace ChoiceWebApp
             app.UseAuthentication();
             app.UseAuthorization();
 
-            DataInitializer.SetData(userManager);
+            app.UseTopSecret();
 
             app.UseEndpoints(endpoints =>
             {
@@ -87,6 +87,8 @@ namespace ChoiceWebApp
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+
+            DataInitializer.SetData(userManager);
         }
     }
 }

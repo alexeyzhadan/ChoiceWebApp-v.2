@@ -1,7 +1,8 @@
-﻿using ChoiceWebApp.Services.Interfaces;
+﻿using ChoiceWebApp.Services;
+using ChoiceWebApp.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ChoiceWebApp.Services.Extensions
+namespace ChoiceWebApp.Extensions
 {
     public static class GroupsServiceExtension
     {
