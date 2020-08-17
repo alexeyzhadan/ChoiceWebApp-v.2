@@ -5,11 +5,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
-using System.Collections.Generic;
 using ChoiceWebApp.Data;
 using ChoiceWebApp.Models;
 using ChoiceWebApp.Attributes;
-using System;
 
 namespace ChoiceWebApp.Controllers
 {
@@ -63,19 +61,30 @@ namespace ChoiceWebApp.Controllers
 
         [ForStudent]
         [HttpPost]
-        public IActionResult Select(string studentId, int[] selectedDiscId)
+        public IActionResult Select([FromBody] string disciplineId)
         {
+            int disciplineIdInt = int.Parse(disciplineId);
+
+            if (!_context.Disciplines.Any(d => d.Id == disciplineIdInt))
+            {
+                return Json(new { success = false, message = "Discipline not found!" });
+            }
+
             var student = _context.Students
                                     .Include(s => s.StudDiscs)
-                                    .SingleOrDefault(s => s.Id == studentId);
-            student.StudDiscs = new List<StudDisc>();
-            foreach (var item in selectedDiscId)
+                                    .SingleOrDefault(s => s.Id == _userManager.GetUserId(HttpContext.User));
+            if (student.StudDiscs.Any(sd => sd.DisciplineId == disciplineIdInt))
             {
-                student.StudDiscs.Add(new StudDisc { StudentId = student.Id, DisciplineId = item });
+                var studDisc = student.StudDiscs.SingleOrDefault(sd => sd.DisciplineId == disciplineIdInt);
+                student.StudDiscs.Remove(studDisc);
+            }
+            else
+            {
+                student.StudDiscs.Add(new StudDisc { StudentId = student.Id, DisciplineId = disciplineIdInt });
             }
             _context.SaveChanges();
 
-            return RedirectToAction(nameof(Select));
+            return Json(new { success = true, message = "The choice of disciplines has been changed!" });
         }
 
         [AllowAnonymous]

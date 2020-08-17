@@ -49,11 +49,13 @@ namespace ChoiceWebApp
                         !context.User.Claims.Any(c => c.Type == "FullName")));
             });
 
+            services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
+
             services.Configure<List<string>>(Configuration.GetSection("DefaultData:Groups"));
             services.AddGroups();
 
             services.AddControllersWithViews();
-            services.AddRazorPages();
+            services.AddRazorPages().AddNewtonsoftJson();
         }
 
         public void Configure(IApplicationBuilder app,
